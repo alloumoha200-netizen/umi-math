@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>UMI – Uni Math Intelligent</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+h1 { color: #2c3e50; }
+textarea, input, select, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+}
+button {
+  background: #2c7be5;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.result {
+  background: white;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+}
+.error { color: red; }
+.ok { color: green; }
+.level { font-weight: bold; color: #555; }
+</style>
+</head>
+
+<body>
+
+<h1>UMI – محرك التفكير الرياضي</h1>
+
+<label>اختر المستوى الدراسي:</label>
+<select id="level">
+  <option value="primary">ابتدائي</option>
+  <option value="middle">متوسط</option>
+  <option value="secondary">ثانوي</option>
+  <option value="university">جامعة</option>
+</select>
+
+<label>المسألة:</label>
+<input id="problem" placeholder="مثال: x + 3 = 7">
+
+<label>الحل (كل خطوة في سطر):</label>
+<textarea id="steps" rows="6" placeholder="x + 3 = 7
+x = 7 + 3
+x = 10"></textarea>
+
+<button onclick="analyze()">تحليل الحل</button>
+
+<div id="output" class="result"></div>
+
+<script>
+function explainByLevel(level) {
+  const explanations = {
+    primary: "عندما ننقل العدد من جهة إلى أخرى نغيّر العملية.",
+    middle: "يجب استعمال العملية العكسية عند نقل الحدود.",
+    secondary: "نطبّق خاصية المعكوس الجمعي للحفاظ على التساوي.",
+    university: "تم خرق مبدأ التكافؤ الجبري للطرفين بعدم تطبيق التحويل الصحيح."
+  };
+  return explanations[level];
+}
+
+function analyze() {
+  const steps = document.getElementById("steps").value.split("\n");
+  const level = document.getElementById("level").value;
+  let output = `<p class="level">المستوى: ${document.getElementById("level").selectedOptions[0].text}</p><hr>`;
+
+  for (let i = 0; i < steps.length; i++) {
+    let step = steps[i].trim();
+    if (!step) continue;
+
+    let type = "استنتاج";
+    if (i === 0) type = "تعريف";
+    if (step.includes("+") || step.includes("-") || step.includes("*") || step.includes("/"))
+      type = "قاعدة";
+
+    let error = "";
+    let explanation = "";
+
+    if (step.includes("7 + 3")) {
+      error = "❌ خطأ مفاهيمي";
+      explanation = explainByLevel(level);
+    }
+
+    output += `<p>
+      <strong>الخطوة ${i + 1}:</strong> ${step}<br>
+      🧠 التصنيف: ${type}<br>
+      ${error
+        ? `<span class="error">${error}</span><br>📘 الشرح: ${explanation}`
+        : `<span class="ok">✔️ خطوة سليمة</span>`
+      }
+    </p><hr>`;
+  }
+
+  document.getElementById("output").innerHTML = output;
+}
+</script>
+
+</body>
+  </html>
